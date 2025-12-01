@@ -1,0 +1,1 @@
+from voice_assistant.voice_assistant import VoiceAssistant

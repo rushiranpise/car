@@ -1,0 +1,32 @@
+Metadata-Version: 2.4
+Name: controller
+Version: 0.0.2
+Summary: Controller for Raspberry Pi
+Home-page: https://github.com/rushiranpise/controller
+Author: SunFounder
+Author-email: service@sunfounder.com
+License: GNU
+Keywords: sunfounder,Controller
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: License :: OSI Approved :: GNU License
+Classifier: Programming Language :: Python :: 3
+License-File: LICENSE
+Requires-Dist: websockets
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: summary
+
+Raspberry Pi
+=======================
+Controller  Library for Raspberry Pi
+
+

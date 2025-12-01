@@ -1,0 +1,33 @@
+
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sensorhat"
+authors = [
+  { name="group5", email="group5@mfg598.com" },
+]
+description = "Robot Hat Python library for Raspberry Pi"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+]
+keywords = ["sensorhat", "mfg598"]
+dynamic = ["version"]
+
+dependencies = [
+  "sunfounder-voice-assistant @ git+https://github.com/rushiranpise/sunfounder-voice-assistant.git",
+]
+
+[project.scripts]
+sensorhat = "sensorhat:__main__"
+
+[tool.setuptools]
+packages = ["sensorhat"]
+
+[tool.setuptools.dynamic]
+version = {attr = "sensorhat.version.__version__"}

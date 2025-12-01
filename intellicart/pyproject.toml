@@ -1,0 +1,33 @@
+
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "picar-x"
+authors = [
+  { name="Group5", email="group5@mfg598.com" },
+]
+description = "Picar X Python library for Raspberry Pi"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+]
+keywords = ["picar-x", "group5"]
+dynamic = ["version"]
+
+dependencies = [
+]
+
+[tool.setuptools]
+packages = [
+  "intellicart",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "intellicart.version.__version__"}
+
+

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Intelli-Cart Controller + Telemetry</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="top-nav">
+    <div class="nav-title">Intelli-Cart Web UI</div>
+  </div>
+
+  <!-- Top: controller UI -->
+  <div class="page">
+    <div class="card">
+      <h1>Intelli-Cart Web Controller</h1>
+
+      <div class="video-wrapper">
+        <img id="video" src="{{ stream_url }}">
+      </div>
+
+      <div class="row" style="margin-top:8px;">
+        <div class="col">
+          <h2>Drive</h2>
+          <div class="label">Joystick + Keyboard: WASD / Arrow Keys</div>
+          <div class="joystick" id="joy-drive"><div class="stick"></div></div>
+        </div>
+        <div class="col">
+          <h2>Camera</h2>
+          <div class="label">Pan / Tilt</div>
+          <div class="joystick" id="joy-cam"><div class="stick"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hud-row">
+        <div class="hud-card">
+          <div class="hud-title">Car Motion</div>
+          <canvas id="car3d-canvas" width="150" height="90"></canvas>
+          <div id="motion-text">Stop</div>
+        </div>
+
+        <div class="hud-card">
+          <div class="hud-title">Obstacle</div>
+          <div id="radar" class="radar radar-safe">
+            <div class="radar-arc"></div>
+            <div class="radar-fill"></div>
+            <div class="radar-label" id="radar-label">Safe</div>
+          </div>
+        </div>
+
+        <div class="hud-card">
+          <div class="hud-title">Line Track</div>
+          <div class="line-track">
+            <div class="line-track-road"></div>
+            <div class="line-track-line"></div>
+            <div class="line-car-dot" id="line-car-dot"></div>
+            <div class="line-status-text" id="line-status">No line</div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Modes</h2>
+      <div class="toggles">
+        <label class="md-switch">
+          <input type="checkbox" id="line_track">
+          <span class="md-slider"></span>
+          <span class="md-label">Line track</span>
+        </label>
+
+        <label class="md-switch">
+          <input type="checkbox" id="avoid_obstacles">
+          <span class="md-slider"></span>
+          <span class="md-label">Avoid obstacles</span>
+        </label>
+
+        <label class="md-switch">
+          <input type="checkbox" id="face_detect">
+          <span class="md-slider"></span>
+          <span class="md-label">Face detect</span>
+        </label>
+
+        <label class="md-switch">
+          <input type="checkbox" id="color_detect">
+          <span class="md-slider"></span>
+          <span class="md-label">Color detect (ALL)</span>
+        </label>
+
+        <label class="md-switch">
+          <input type="checkbox" id="color_follow">
+          <span class="md-slider"></span>
+          <span class="md-label">Color auto-follow</span>
+        </label>
+      </div>
+
+      <button id="horn">Horn</button>
+      <button id="stop" class="secondary">STOP</button>
+
+      <div class="gauge">
+        <svg viewBox="0 0 200 120">
+          <path d="M20,100 A80,80 0 0,1 180,100"
+                fill="none" stroke="#252a3e" stroke-width="14" />
+          <g stroke="#3b4260" stroke-width="2">
+            <line x1="40" y1="95" x2="36" y2="89" />
+            <line x1="100" y1="23" x2="100" y2="16" />
+            <line x1="160" y1="95" x2="164" y2="89" />
+          </g>
+          <path d="M20,100 A80,80 0 0,1 180,100"
+                fill="none" stroke="#2e63ff" stroke-width="6" stroke-linecap="round" />
+          <line id="needle" x1="100" y1="100" x2="100" y2="30"
+                stroke="#ffeb86" stroke-width="3" />
+          <circle cx="100" cy="100" r="5" fill="#ffeb86" />
+          <text x="32" y="110" fill="#7b82a0" font-size="9">0</text>
+          <text x="95" y="18" fill="#7b82a0" font-size="9">50</text>
+          <text x="162" y="110" fill="#7b82a0" font-size="9">100</text>
+        </svg>
+        <div class="gauge-speed-text">
+          <span id="speed-val">0</span> / 100
+        </div>
+      </div>
+
+      <div class="settings">
+        <label>Max speed: <span id="max-speed-label">100</span>
+          <small>(manual + follow)</small>
+        </label>
+        <input type="range" id="max-speed" min="20" max="100" value="100">
+
+        <div class="settings-group">
+          <label>Safe distance: <span id="safe-distance-label">40</span> cm</label>
+          <input type="range" id="safe-distance" min="20" max="80" value="40">
+        </div>
+
+        <div class="settings-group">
+          <label>Danger distance: <span id="danger-distance-label">20</span> cm</label>
+          <input type="range" id="danger-distance" min="5" max="40" value="20">
+        </div>
+      </div>
+
+      <div style="margin-top:10px;font-size:13px;">
+        Distance: <span id="dist">–</span> cm<br>
+        Line raw: <span id="linestate">–</span><br>
+        Mode: <span id="mode">Manual</span><br>
+        IP: {{ ip }}
+      </div>
+    </div>
+
+    <!-- Telemetry section under controller -->
+    <div class="card telemetry-card-full">
+      <h1>Telemetry Dashboard</h1>
+      <p class="telemetry-subtitle">
+        Live charts + history (stored in SQLite).
+      </p>
+
+      <div class="telemetry-grid">
+        <div class="telemetry-card">
+          <h2>Speed (smoothed)</h2>
+          <canvas id="chart-speed"></canvas>
+        </div>
+
+        <div class="telemetry-card">
+          <h2>Motor Input (raw)</h2>
+          <canvas id="chart-motor"></canvas>
+        </div>
+
+        <div class="telemetry-card">
+          <h2>CPU Temperature</h2>
+          <canvas id="chart-cpu"></canvas>
+        </div>
+
+        <div class="telemetry-card">
+          <h2>Distance (cm)</h2>
+          <canvas id="chart-distance"></canvas>
+        </div>
+
+        <div class="telemetry-card">
+          <h2>Line Sensors (L/M/R)</h2>
+          <canvas id="chart-line"></canvas>
+        </div>
+
+        <div class="telemetry-card">
+          <h2>Modes & Obstacles</h2>
+          <canvas id="chart-modes"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='controller.js') }}"></script>
+  <script src="{{ url_for('static', filename='telemetry.js') }}"></script>
+</body>
+</html>

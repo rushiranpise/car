@@ -1,0 +1,1 @@
+from sensorhat.voice_assistant import VoiceAssistant
